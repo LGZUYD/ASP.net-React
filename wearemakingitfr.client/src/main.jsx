@@ -5,8 +5,7 @@ import './index.css'
 import Message from './Message.jsx'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
-        
+  <React.StrictMode>        
     <Message/>
   </React.StrictMode>,
 )

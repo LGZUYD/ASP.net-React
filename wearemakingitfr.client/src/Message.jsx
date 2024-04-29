@@ -15,6 +15,27 @@ function Message() {
             .catch(error => console.log(error));
     };
 
+    const createMessage = (event) => {
+
+        event.preventDefault();
+        const form = event.target;
+        const formData = new FormData(form);
+
+        fetch('https://localhost:7247/messages', {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ MessageContent: formData.get('createMessage') })
+        })
+            .then(() => fetchMessages())
+            .catch(error => {
+                console.error('Error sending data:', error);
+            });
+
+    }
+
     const deleteMessage = (id) => {
         fetch(`https://localhost:7247/messages/${id}`, {
             method: 'DELETE',
@@ -26,7 +47,7 @@ function Message() {
             .catch(error => console.log(error));
     };
 
-    const updateMessage = (event) => { // dit werkt niet
+    const updateMessage = (event) => { 
         event.preventDefault();
         const form = event.target;
         const formData = new FormData(form);
@@ -46,6 +67,17 @@ function Message() {
     };
 
     return (
+        <>
+            <form onSubmit={createMessage}>
+                <label>
+                    Create new message
+                    <input
+                        type="text"
+                        name="createMessage"
+                    />                    
+                </label>
+                <button type="submit">Submit</button>
+            </form>
         <div>
             {messages.map((message) => (
                 <div className="message" key={message.messageId}>
@@ -67,7 +99,8 @@ function Message() {
                     </li>
                 </div>
             ))}
-        </div>
+            </div>
+        </>
     );
 }
 
