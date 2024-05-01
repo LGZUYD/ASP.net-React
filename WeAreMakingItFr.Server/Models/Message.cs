@@ -1,18 +1,21 @@
-﻿namespace PleaseAPI.Models
+﻿using WeAreMakingItFr.Server.Models;
+
+namespace PleaseAPI.Models
 {
     public class Message
     {
         public int MessageId { get; set; }
         public string? MessageContent{ get; set; }
+        public List<Comment>? AllComments { get; set; }
 
         public Message()
         {            
         }
-
-        public Message(int messageId, string messageContent)    
+        public Message(int messageId, string messageContent, List<Comment> allComments)    
         {
             MessageId = messageId;
             MessageContent = messageContent;
+            AllComments = allComments;
         }
         public Message(string messageContent)
         {

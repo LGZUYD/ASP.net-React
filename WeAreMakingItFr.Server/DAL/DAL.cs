@@ -1,17 +1,19 @@
 ﻿using Azure.Messaging;
 using Microsoft.Data.SqlClient;
 using PleaseAPI.Models;
+using System.Data.Common;
+using WeAreMakingItFr.Server.Models;
 
 namespace PleaseAPI.DAL
 {
-    static public class DAL
+    public class DAL
     {
         private static readonly string connString = "Data Source=LUCAS;Initial Catalog=Project;Integrated Security=True;Connect Timeout=30;Encrypt=False;Trust Server Certificate=False;Application Intent=ReadWrite;Multi Subnet Failover=False";
 
-        public static class MessageDAL
+        public class MessageDAL
         {
-            static List<Message> allMessages = new List<Message>();
-            public static List<Message> GetMessages()
+            private List<Message> allMessages = new List<Message>();
+            public List<Message> GetMessages()
             {
                 allMessages.Clear();
                 using (SqlConnection connection = new SqlConnection(connString))
@@ -27,7 +29,10 @@ namespace PleaseAPI.DAL
                             {
                                 int id = reader.GetInt32(0);
                                 string messageContent = reader.GetString(1);
-                                Message msgToAdd = new Message(id, messageContent);
+                                CommentsDAL newCommentDAL = new CommentsDAL();
+                                List<Comment> allComments = newCommentDAL.getCommentsByMessageId(id);
+                                
+                                Message msgToAdd = new Message(id, messageContent, allComments);
                                 allMessages.Add(msgToAdd);
                             }
                         }
@@ -36,7 +41,7 @@ namespace PleaseAPI.DAL
                 return allMessages;
             }
             public static void CreateNewPost(Message MessageToInsert)
-            {                
+            {
                 using (SqlConnection connection = new SqlConnection(connString))
                 {
                     connection.Open();
@@ -88,5 +93,63 @@ namespace PleaseAPI.DAL
                 }
             }
         }
+
+        public class CommentsDAL
+        {
+            private List<Comment> allComments = new List<Comment>();
+            public List<Comment> getCommentsByMessageId(int messageId)
+            {
+                allComments.Clear();
+                using (SqlConnection connection = new SqlConnection(connString))
+                {
+                    connection.Open();
+
+                    string query = $"Select * from [Comments] where messageId = @messageId";
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@messageId", messageId);
+
+                        using (SqlDataReader reader = command.ExecuteReader())
+                        {
+
+                            while (reader.Read())
+                            {
+                                int id = reader.GetInt32(0);
+                                string commentContent = reader.GetString(2);
+                                Comment commentToAdd = new Comment(id, messageId, commentContent);
+                                //System.Diagnostics.Debug.WriteLine(messageId);
+                                //System.Diagnostics.Debug.WriteLine("------------------");
+                                //System.Diagnostics.Debug.WriteLine(commentToAdd.CommentContent);
+                                //System.Diagnostics.Debug.WriteLine(commentToAdd.MessageId);
+                                //System.Diagnostics.Debug.WriteLine(commentToAdd.CommentId);
+                                //System.Diagnostics.Debug.WriteLine("==================");
+                                allComments.Add(commentToAdd);                                
+                            }
+                        }
+                    }
+                }
+                return allComments;
+            }
+
+            public static void CreateNewComment(Comment CommentToInsert)
+            {
+                using (SqlConnection connection = new SqlConnection(connString))
+                {
+                    connection.Open();
+
+                    string query = "INSERT INTO [Comments](messageId, commentContent) VALUES(@messageId, @commentContent)";
+
+                    using (SqlCommand dbCommand = new SqlCommand(query, connection))
+                    {                        
+                        dbCommand.Parameters.AddWithValue("@messageId", CommentToInsert.MessageId);
+                        dbCommand.Parameters.AddWithValue("@commentContent", CommentToInsert.CommentContent);
+                        dbCommand.ExecuteNonQuery();
+                    }
+                }
+
+            }
+
+        }
+
     }
 }

@@ -1,6 +1,6 @@
 @WeAreMakingItFr.Server_HostAddress = http://localhost:5107
 
-GET {{WeAreMakingItFr.Server_HostAddress}}/messages/
-Accept: application/json
+# GET {{WeAreMakingItFr.Server_HostAddress}}/messages/
+# Accept: application/json
 
-###
+# ###

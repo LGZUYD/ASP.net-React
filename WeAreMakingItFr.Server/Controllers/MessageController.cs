@@ -16,9 +16,9 @@ namespace PleaseAPI.Controllers
         [HttpGet]
         [Route("/messages")]
         public IActionResult GetMessages()
-        {            
-            // ...
-            return Ok(DAL.DAL.MessageDAL.GetMessages());
+        {
+            DAL.DAL.MessageDAL messageDAL = new DAL.DAL.MessageDAL();
+            return Ok(messageDAL.GetMessages());
         }
 
         [HttpGet]
@@ -33,7 +33,7 @@ namespace PleaseAPI.Controllers
         public IActionResult CreateMessage([FromBody] Message message)
         {
             //Message message = JsonConvert.DeserializeObject<Message>(requestBody.ToString());
-            Console.WriteLine(message.MessageContent);
+            
             DAL.DAL.MessageDAL.CreateNewPost(message);
             //this.GetMessages();
 
