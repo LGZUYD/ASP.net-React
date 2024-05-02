@@ -42,6 +42,7 @@ app.UseCors("CORSPolicy");
 
 app.UseHttpsRedirection();
 
+app.UseRouting();
 
 app.MapFallbackToFile("/index.html");
 
