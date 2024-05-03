@@ -1,0 +1,19 @@
+body {
+}
+
+.container {
+    margin-left: 30%;
+    width: fit-content;
+    border-style: inset;
+    border-color: red;
+    display: flex;
+    flex-direction: column;
+}
+
+#login {
+    margin: 10%;
+}
+
+#create-account {
+    margin: 10%;
+}

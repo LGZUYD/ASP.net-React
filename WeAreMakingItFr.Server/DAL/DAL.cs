@@ -31,7 +31,7 @@ namespace PleaseAPI.DAL
                                 string messageContent = reader.GetString(1);
                                 CommentsDAL newCommentDAL = new CommentsDAL();
                                 List<Comment> allComments = newCommentDAL.getCommentsByMessageId(id);
-                                
+
                                 Message msgToAdd = new Message(id, messageContent, allComments);
                                 allMessages.Add(msgToAdd);
                             }
@@ -123,7 +123,7 @@ namespace PleaseAPI.DAL
                                 //System.Diagnostics.Debug.WriteLine(commentToAdd.MessageId);
                                 //System.Diagnostics.Debug.WriteLine(commentToAdd.CommentId);
                                 //System.Diagnostics.Debug.WriteLine("==================");
-                                allComments.Add(commentToAdd);                                
+                                allComments.Add(commentToAdd);
                             }
                         }
                     }
@@ -140,7 +140,7 @@ namespace PleaseAPI.DAL
                     string query = "INSERT INTO [Comments](messageId, commentContent) VALUES(@messageId, @commentContent)";
 
                     using (SqlCommand dbCommand = new SqlCommand(query, connection))
-                    {                        
+                    {
                         dbCommand.Parameters.AddWithValue("@messageId", CommentToInsert.MessageId);
                         dbCommand.Parameters.AddWithValue("@commentContent", CommentToInsert.CommentContent);
                         dbCommand.ExecuteNonQuery();
@@ -151,5 +151,90 @@ namespace PleaseAPI.DAL
 
         }
 
+        public class UserDAL
+        {
+            public static void CreateNewUser(User userToCreate)
+            {
+                using (SqlConnection connection = new SqlConnection(connString))
+                {
+                    connection.Open();
+
+                    string query = "INSERT INTO [Users](userName, userPassword) VALUES(@userName, @userPassword)";
+
+                    using (SqlCommand dbCommand = new SqlCommand(query, connection))
+                    {
+                        dbCommand.Parameters.AddWithValue("@userName", userToCreate.Username);
+                        dbCommand.Parameters.AddWithValue("@userPassword", userToCreate.Password);
+                        dbCommand.ExecuteNonQuery();
+                    }
+                }
+            }
+            public static bool CheckUserAvailable(User userToCheck)
+            {
+
+                using (SqlConnection connection = new SqlConnection(connString))
+                {
+                    connection.Open();
+
+                    string query = $"Select * from [Users] where userName = @userName";
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@userName", userToCheck.Username);
+
+                        using (SqlDataReader reader = command.ExecuteReader())
+                        {
+                            if (reader.HasRows)
+                            {
+                                return false;
+                            }
+                            else
+                            {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+            public static bool CheckUserLogin(User userToCheck)
+            {
+                using (SqlConnection connection = new SqlConnection(connString))
+                {
+                    connection.Open();
+
+                    string query = $"Select * from [Users] where userName = @userName";
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@userName", userToCheck.Username);
+
+                        using (SqlDataReader reader = command.ExecuteReader())
+                        {
+                            if (reader.HasRows)
+                            {
+                                while (reader.Read())
+                                {
+                                    if (reader[2].ToString() == userToCheck.Password)
+                                    {
+                                        return true;
+                                    }
+                                    else
+                                    {
+                                        return false;
+                                    }
+                                }
+                            }
+                            else
+                            {                
+                                return false;
+                            }
+                        }
+                    }
+                }                
+                return false;
+            }
+
+
+        }
     }
 }
+
+
